@@ -63,12 +63,12 @@ QR_CODE = environ.get('QR_CODE', 'Your_Qr_Code')    # QR code image for payments
 OWNER_UPI_ID = environ.get('OWNER_UPI_ID', 'ɴᴏ ᴀᴠᴀɪʟᴀʙʟᴇ ʀɪɢʜᴛ ɴᴏᴡ')    # Owner UPI ID for payments
 
 STAR_PREMIUM_PLANS = {
-    10: "7day",
-    20: "15day",    
-    40: "1month", 
-    55: "45day",
-    75: "60day",
-}  # Premium plans with their respective durations in days
+    20:  "7day",
+    40:  "15day",
+    80:  "1month",
+    110: "45day",
+    130: "60day",
+}  # Star amounts matching INR plan prices (20₹=20⭐, 40₹=40⭐, etc.)
 
 # ============================
 # MongoDB Configuration
@@ -77,9 +77,21 @@ DATABASE_URI = environ.get('DATABASE_URI', "")  # MongoDB URI for the database
 DATABASE_NAME = environ.get('DATABASE_NAME', "Cluster0") # Database name (default: cluster)
 COLLECTION_NAME = environ.get('COLLECTION_NAME', 'royal_files') # Collection name (default: dreamcinezone_files)
 
-# If MULTIPLE_DB Is True Then Fill DATABASE_URI2 Value Else You Will Get Error.
-MULTIPLE_DB = is_enabled(os.environ.get('MULTIPLE_DB', "False"), False) # Type True For Turn On MULTIPLE DB FUNTION 
-DATABASE_URI2 = environ.get('DATABASE_URI2', "")  # MongoDB URI for the second database (if MULTIPLE_DB is True)
+# ============================
+# Multi-Database Configuration (Up to 5 MongoDB DBs)
+# ============================
+MULTIPLE_DB   = is_enabled(os.environ.get('MULTIPLE_DB', "False"), False)  # Set True to enable multi-DB
+DB_SIZE_LIMIT  = int(os.environ.get('DB_SIZE_LIMIT', 480))  # MB — switch to next DB when this limit is reached
+
+DATABASE_URI2  = environ.get('DATABASE_URI2', "")   # 2nd MongoDB URI
+DATABASE_URI3  = environ.get('DATABASE_URI3', "")   # 3rd MongoDB URI
+DATABASE_URI4  = environ.get('DATABASE_URI4', "")   # 4th MongoDB URI
+DATABASE_URI5  = environ.get('DATABASE_URI5', "")   # 5th MongoDB URI
+
+DATABASE_NAME2 = environ.get('DATABASE_NAME2', DATABASE_NAME)  # 2nd DB name (defaults to same)
+DATABASE_NAME3 = environ.get('DATABASE_NAME3', DATABASE_NAME)  # 3rd DB name
+DATABASE_NAME4 = environ.get('DATABASE_NAME4', DATABASE_NAME)  # 4th DB name
+DATABASE_NAME5 = environ.get('DATABASE_NAME5', DATABASE_NAME)  # 5th DB name
 # ============================
 # Movie Notification & Update Settings
 # ============================
@@ -158,8 +170,8 @@ PROTECT_CONTENT = is_enabled((environ.get('PROTECT_CONTENT', "False")), False) #
 PM_SEARCH = bool(environ.get('PM_SEARCH', True))  # PM Search On (True) / Off (False)
 EMOJI_MODE = bool(environ.get('EMOJI_MODE', False))  # Emoji status On (True) / Off (False)
 BUTTON_MODE = is_enabled((environ.get('BUTTON_MODE', "False")), False) # pm & Group button or link mode (True) / Off (False)
-STREAM_MODE = bool(environ.get('STREAM_MODE', False)) # Set Stream mode True or False
-PREMIUM_STREAM_MODE = bool(environ.get('PREMIUM_STREAM_MODE', False)) # Set Stream mode True or False only for premium users
+STREAM_MODE = is_enabled(environ.get('STREAM_MODE', 'False'), False)  # Enable stream/download link button
+PREMIUM_STREAM_MODE = is_enabled(environ.get('PREMIUM_STREAM_MODE', 'False'), False)  # Stream only for premium users
 
 
 # ============================
@@ -223,7 +235,7 @@ if 'DYNO' in environ:
     APP_NAME = str(getenv('APP_NAME'))
 else:
     ON_HEROKU = False
-HAS_SSL = bool(getenv('HAS_SSL', True))
+HAS_SSL = is_enabled(getenv('HAS_SSL', 'True'), True)
 if HAS_SSL:
     URL = "https://{}/".format(FQDN)
 else:
@@ -249,6 +261,14 @@ Bot_cmds = {
 
 Admin_cmds = {
     "stats": "Gᴇᴛ Bᴏᴛ Sᴛᴀᴛs",
+    "glist": "Sᴀʙ ɢʀᴏᴜᴘs ᴋɪ ʟɪsᴛ ᴀᴜʀ ᴘᴀɴᴇʟ",
+    "ginfo": "Sᴘᴇᴄɪғɪᴄ ɢʀᴏᴜᴘ ᴄᴏɴᴛʀᴏʟ ᴘᴀɴᴇʟ",
+    "gverify": "Gʀᴏᴜᴘ Vᴇʀɪғʏ ᴏɴ/ᴏғғ ᴛᴏɢɢʟᴇ",
+    "gban": "Gʀᴏᴜᴘ ᴋᴏ ʙᴀɴ ᴋᴀʀᴏ",
+    "gunban": "Gʀᴏᴜᴘ ᴋᴏ ᴜɴʙᴀɴ ᴋᴀʀᴏ",
+    "gleave": "Bᴏᴛ ᴋᴏ ғᴏʀᴄᴇ ʟᴇᴀᴠᴇ ᴋᴀʀᴡᴀᴏ",
+    "greset": "Gʀᴏᴜᴘ sᴇᴛᴛɪɴɢs ʀᴇsᴇᴛ ᴋᴀʀᴏ",
+    "gall": "Sᴀʙ ɢʀᴏᴜᴘs ʀᴀᴡ ɪᴅ ʟɪsᴛ",
     "broadcast": "ʙʀᴏᴀᴅᴄᴀꜱᴛ ᴀ ᴍᴇꜱꜱᴀɢᴇ ᴛᴏ ᴀʟʟ ᴜꜱᴇʀꜱ.",
     "grp_broadcast": "ʙʀᴏᴀᴅᴄᴀsᴛ ᴀ ᴍᴇssᴀɢᴇ ᴛᴏ ᴀʟʟ ᴄᴏɴɴᴇᴄᴛᴇᴅ ɢʀᴏᴜᴘs",
     "del_msg": "ʀᴇᴍᴏᴠᴇ ғɪʟᴇ ɴᴀᴍᴇ ᴄᴏʟʟᴇᴄᴛɪᴏɴ ɴᴏтɪғɪᴄᴀᴛɪᴏɴ...",

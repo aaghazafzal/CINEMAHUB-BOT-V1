@@ -41,11 +41,14 @@ SPELL_CHECK = {}
 @Client.on_message(filters.group & filters.text & filters.incoming)
 async def give_filter(client, message):
     if EMOJI_MODE:
-        try:
-            await message.react(emoji=random.choice(REACTIONS), big=True)
-        except Exception:
-            await message.react(emoji="⚡️", big=True)
-    await mdb.update_top_messages(message.from_user.id, message.text)
+        async def _react_bg(msg):
+            try:
+                await msg.react(emoji=random.choice(REACTIONS), big=True)
+            except Exception:
+                pass
+        asyncio.create_task(_react_bg(message))
+    
+    asyncio.create_task(mdb.update_top_messages(message.from_user.id, message.text))
     if message.chat.id != SUPPORT_CHAT_ID:
         settings = await get_settings(message.chat.id)
         try:
@@ -81,14 +84,17 @@ async def pm_text(bot, message):
     user = message.from_user.first_name
     user_id = message.from_user.id
     if EMOJI_MODE:
-        try:
-            await message.react(emoji=random.choice(REACTIONS), big=True)
-        except Exception:
-            await message.react(emoji="⚡️", big=True)
-    if content.startswith(("#")):
+        async def _react_bg(msg):
+            try:
+                await msg.react(emoji=random.choice(REACTIONS), big=True)
+            except Exception:
+                pass
+        asyncio.create_task(_react_bg(message))
+    if content.startswith("#"):
         return
     try:
-        await mdb.update_top_messages(user_id, content)
+        asyncio.create_task(mdb.update_top_messages(user_id, content))
+
         pm_search = await db.pm_search_status(bot_id)
         if pm_search:
             await auto_filter(bot, message)
@@ -116,28 +122,115 @@ async def pm_text(bot, message):
 
 @Client.on_callback_query(filters.regex(r"^reffff"))
 async def refercall(bot, query):
-    btn = [[
-        InlineKeyboardButton(
-            'invite link', url=f'https://telegram.me/share/url?url=https://t.me/{bot.me.username}?start=reff_{query.from_user.id}&text=Hello%21%20Experience%20a%20bot%20that%20offers%20a%20vast%20library%20of%20unlimited%20movies%20and%20series.%20%F0%9F%98%83'),
-        InlineKeyboardButton(
-            f'⏳ {referdb.get_refer_points(query.from_user.id)}', callback_data='ref_point'),
-        InlineKeyboardButton('Back', callback_data='premium_info')
-    ]]
+    uid = query.from_user.id
+    points = referdb.get_refer_points(uid)
+    total  = referdb.get_total_refers(uid)
+    ref_link = f"https://t.me/{bot.me.username}?start=reff_{uid}"
+
+    # Progress bars - plain squares
+    def pbar(current, goal, length=8):
+        filled = min(int((current / goal) * length), length)
+        return "■" * filled + "□" * (length - filled)
+
+    bar10 = pbar(min(points, 10), 10)
+    bar20 = pbar(min(points, 20), 20)
+
+    can_claim_10 = points >= 10
+    can_claim_20 = points >= 20
+
+
+    text = (
+        f"👫 REFER & EARN PREMIUM\n"
+        f"========================\n\n"
+        f"⭐ Abhi ke Points  :  {points}\n"
+        f"🔗 Kul Refer       :  {total}\n\n"
+        f"- - - - - - - - - - - -\n\n"
+        f"🎁  10 pts  =  10 Din Premium\n"
+        f"{bar10}   [{min(points,10)}/10]\n\n"
+        f"🏆  20 pts  =  30 Din Premium\n"
+        f"{bar20}   [{min(points,20)}/20]\n\n"
+        f"- - - - - - - - - - - -\n"
+        f"📤 Apna REFER LINK:\n"
+        f"{ref_link}"
+    )
+
+
+    claim_btns = []
+    if can_claim_10:
+        claim_btns.append(InlineKeyboardButton("🎁 10 ᴅɪɴ ᴄʟᴀɪᴍ ᴋᴀʀᴏ", callback_data="claim_10"))
+    if can_claim_20:
+        claim_btns.append(InlineKeyboardButton("🏆 30 ᴅɪɴ ᴄʟᴀɪᴍ ᴋᴀʀᴏ", callback_data="claim_20"))
+
+    btn = []
+    if claim_btns:
+        btn.append(claim_btns)
+    btn.append([
+        InlineKeyboardButton("📤 ꜱʜᴀʀᴇ ʟɪɴᴋ", url=f"https://telegram.me/share/url?url={ref_link}&text=Join+and+get+premium+access!"),
+    ])
+    btn.append([InlineKeyboardButton("« ʙᴀᴄᴋ", callback_data="premium_info")])
+
     reply_markup = InlineKeyboardMarkup(btn)
     try:
-        await bot.edit_message_media(
-            query.message.chat.id,
-            query.message.id,
-            InputMediaPhoto("https://graph.org/file/1a2e64aee3d4d10edd930.jpg")
+        await query.message.edit_text(
+            text=text,
+            reply_markup=reply_markup
         )
-    except Exception as e:    
-        pass
-    await query.message.edit_text(
-        text=f'Hay Your refer link:\n\nhttps://t.me/{bot.me.username}?start=reff_{query.from_user.id}\n\nShare this link with your friends, Each time they join,  you will get 10 refferal points and after 100 points you will get 1 month premium subscription.',
-        reply_markup=reply_markup,
-        parse_mode=enums.ParseMode.HTML
-    )
+    except Exception:
+        await query.answer(text[:200], show_alert=True)
     await query.answer()
+
+
+@Client.on_callback_query(filters.regex(r"^claim_(10|20)$"))
+async def claim_refer_reward(bot, query):
+    import datetime, pytz
+    from database.users_chats_db import db as userdb
+    uid = query.from_user.id
+    kind = query.data  # claim_10 or claim_20
+
+    points = referdb.get_refer_points(uid)
+
+    if kind == "claim_10":
+        if points < 10:
+            return await query.answer("⚠️ 10 ᴘᴏɪɴᴛ ɴᴀʜɪ ʜᴀɪɴ!", show_alert=True)
+        days = 10
+        cost = 10
+    else:
+        if points < 20:
+            return await query.answer("⚠️ 20 ᴘᴏɪɴᴛ ɴᴀʜɪ ʜᴀɪɴ!", show_alert=True)
+        days = 30
+        cost = 20
+
+    # Grant premium
+    seconds = days * 86400
+    existing = await userdb.get_user(uid)
+    current_expiry = existing.get("expiry_time") if existing else None
+    if current_expiry and current_expiry > datetime.datetime.now():
+        # Extend existing premium
+        new_expiry = current_expiry + datetime.timedelta(seconds=seconds)
+    else:
+        new_expiry = datetime.datetime.now() + datetime.timedelta(seconds=seconds)
+
+    await userdb.update_user({"id": uid, "expiry_time": new_expiry})
+    referdb.deduct_points(uid, cost)
+
+    expiry_str = new_expiry.astimezone(pytz.timezone("Asia/Kolkata")).strftime("%d-%m-%Y %I:%M %p")
+    await query.answer(f"🎉 {days} ᴅɪɴ ᴘʀᴇᴍɪᴜᴍ ᴍɪʟ ɢᴀʏᴀ! ᴇxᴘɪʀʏ: {expiry_str}", show_alert=True)
+    try:
+        remaining = referdb.get_refer_points(uid)
+        await query.message.edit_text(
+            f"✅ <b>ᴘʀᴇᴍɪᴜᴍ ᴄʟᴀɪᴍ ʜᴏ ɢᴀʏᴀ!</b>\n\n"
+            f"⏰ {days} ᴅɪɴ ᴘʀᴇᴍɪᴜᴍ ᴍɪʟ ɢᴀʏᴀ\n"
+            f"📅 ᴇxᴘɪʀʏ: <code>{expiry_str}</code>\n"
+            f"⭐ ʙᴀᴄʜᴇ ᴘᴏɪɴᴛ: <code>{remaining}</code>\n\n"
+            f"ᴀᴜʀ ʟᴏɢᴏɴ ᴋᴏ ʀᴇꜰᴇʀ ᴋᴀʀᴛᴇ ʀᴀʜᴏ! 💪",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("👥 ʀᴇꜰᴇʀ ᴀɢᴀɪɴ", callback_data="reffff"),
+                InlineKeyboardButton("« ʙᴀᴄᴋ", callback_data="premium_info")
+            ]]),
+            parse_mode=enums.ParseMode.HTML
+        )
+    except Exception:
+        pass
 
 @Client.on_callback_query(filters.regex(r"^next"))
 async def next_page(bot, query):
@@ -1004,7 +1097,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         title = query.message.chat.title
         settings = await get_settings(grp_id)
         if settings is not None:
-            btn = await group_setting_buttons(int(grp_id))
+            btn = await group_setting_buttons(int(grp_id), query.from_user.id)
             reply_markup = InlineKeyboardMarkup(btn)
             await query.message.edit_text(
                 text=f"<b>ᴄʜᴀɴɢᴇ ʏᴏᴜʀ ꜱᴇᴛᴛɪɴɢꜱ ꜰᴏʀ {title} ᴀꜱ ʏᴏᴜ ᴡɪꜱʜ ⚙</b>",
@@ -1034,7 +1127,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         await query.message.edit_text(f"<b>ʏᴏᴜʀ sᴇᴛᴛɪɴɢs ᴍᴇɴᴜ ғᴏʀ {title} ʜᴀs ʙᴇᴇɴ sᴇɴᴛ ᴛᴏ ʏᴏᴜ ʙʏ ᴅᴍ.</b>")
         await query.message.edit_reply_markup(reply_markup)
         if settings is not None:
-            btn = await group_setting_buttons(int(grp_id))
+            btn = await group_setting_buttons(int(grp_id), query.from_user.id)
             reply_markup = InlineKeyboardMarkup(btn)
             await client.send_message(
                 chat_id=userid,
@@ -1541,20 +1634,25 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 )
                 return
             else:
-                await db.give_free_trial(user_id)
-                await query.answer("✅ Trial activated!", show_alert=True)
-
+                import datetime as _dt, pytz as _ptz
+                from database.refer import referdb as _rdb
+                expiry = _dt.datetime.now() + _dt.timedelta(days=7)
+                await db.update_user({"id": user_id, "expiry_time": expiry})
+                _rdb.mark_trial_used(user_id)
+                ed = expiry.astimezone(_ptz.timezone("Asia/Kolkata")).strftime("%d-%m-%Y %I:%M %p")
                 msg = await client.send_photo(
                     chat_id=query.message.chat.id,
                     photo="https://i.ibb.co/0jC8MSDZ/photo-2025-07-26-10-42-36-7531339283701956616.jpg",
                     caption=(
-                        "<b>🥳 ᴄᴏɴɢʀᴀᴛᴜʟᴀᴛɪᴏɴꜱ\n\n"
-                        "🎉 ʏᴏᴜ ᴄᴀɴ ᴜsᴇ ꜰʀᴇᴇ ᴛʀᴀɪʟ ꜰᴏʀ <u>5 ᴍɪɴᴜᴛᴇs</u> ꜰʀᴏᴍ ɴᴏᴡ !\n\n"
-                        "ɴᴇᴇᴅ ᴘʀᴇᴍɪᴜᴍ 👉🏻 /plan</b>"
+                        "🥳 CONGRATULATIONS!\n\n"
+                        f"🎉 7 din ka FREE TRIAL shuru ho gaya!\n"
+                        f"📅 Expiry: {ed}\n\n"
+                        "Premium features enjoy karo! 🚀\n"
+                        "Need premium? 👉 /plan"
                     ),
                     parse_mode=enums.ParseMode.HTML,
                     reply_markup=InlineKeyboardMarkup([[
-                        InlineKeyboardButton("🚀 Buy Premium 🚀", callback_data="premium_info")
+                        InlineKeyboardButton("�� Buy Premium 🚀", callback_data="premium_info")
                     ]])
                 )
                 await asyncio.sleep(DELETE_TIME)
@@ -1671,7 +1769,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         if not await is_check_admin(client, int(grp_id), user_id):
             return await query.answer(script.NT_ADMIN_ALRT_TXT, show_alert=True)
 
-        btn = await group_setting_buttons(int(grp_id))
+        btn = await group_setting_buttons(int(grp_id), query.from_user.id)
         dreamx = await client.get_chat(int(grp_id))
         await query.message.edit(text=f"ᴄʜᴀɴɢᴇ ʏᴏᴜʀ ɢʀᴏᴜᴘ ꜱᴇᴛᴛɪɴɢꜱ ✅\nɢʀᴏᴜᴘ ɴᴀᴍᴇ - '{dreamx.title}'</b>⚙", reply_markup=InlineKeyboardMarkup(btn))
 
@@ -1719,7 +1817,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             await query.answer("ᴏɴ ✓")
         settings = await get_settings(int(grp_id))
         if settings is not None:
-            btn = await group_setting_buttons(int(grp_id))
+            btn = await group_setting_buttons(int(grp_id), query.from_user.id)
             reply_markup = InlineKeyboardMarkup(btn)
             await query.message.edit_reply_markup(reply_markup)
     await query.answer(MSG_ALRT)

@@ -1,0 +1,95 @@
+services:
+  - type: web
+    name: cinemahub-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python3 bot.py
+    plan: free
+    envVars:
+      # ── Bot Core ─────────────────────────────────────────────
+      - key: SESSION
+        value: cinemahub_bot
+      - key: API_ID
+        value: "34188240"
+      - key: API_HASH
+        value: 55c523e8763dff723a481b8dd6ddb7b5
+      - key: BOT_TOKEN
+        value: "8737984692:AAFCesMuIa1-677TwwQWhHEx2nPtUf8zwoA"
+
+      # ── MongoDB ───────────────────────────────────────────────
+      - key: DATABASE_URI
+        value: "mongodb+srv://cinemahubbot:aaghaz9431@cinemahubbot.62lryic.mongodb.net/?appName=cinemahubbot"
+      - key: DATABASE_NAME
+        value: cinemahubbot
+      - key: COLLECTION_NAME
+        value: cinemahub_files
+      - key: DATABASE_URI2
+        value: "mongodb+srv://cinemahub2:aaghaz9431@cinemahub2.kqhjdhv.mongodb.net/?appName=cinemahub2"
+
+      # ── Admin & Channels ──────────────────────────────────────
+      - key: ADMINS
+        value: "6459748525 7097905601"
+      - key: LOG_CHANNEL
+        value: "-1003852011191"
+      - key: BIN_CHANNEL
+        value: "-1003723777295"
+      - key: CHANNELS
+        value: "-1003708408129"
+      - key: PREMIUM_LOGS
+        value: "-1003852011191"
+      - key: DELETE_CHANNELS
+        value: "-1003852011191"
+
+      # ── Support Links ─────────────────────────────────────────
+      - key: SUPPORT_CHAT
+        value: "https://t.me/Univora88"
+      - key: GRP_LNK
+        value: "https://t.me/Univora88"
+      - key: OWNER_LNK
+        value: "https://t.me/rolexsir_8"
+      - key: UPDATE_CHNL_LNK
+        value: "https://t.me/Univora88"
+
+      # ── Bot Settings ──────────────────────────────────────────
+      - key: PORT
+        value: "8080"
+      - key: WEB_SERVER_BIND_ADDRESS
+        value: "0.0.0.0"
+      - key: AUTO_FFILTER
+        value: "True"
+      - key: AUTO_DELETE
+        value: "True"
+      - key: SPELL_CHECK_REPLY
+        value: "True"
+      - key: PM_SEARCH
+        value: "True"
+      - key: MAX_BTN
+        value: "True"
+      - key: IMDB
+        value: "False"
+      - key: PROTECT_CONTENT
+        value: "False"
+      - key: MULTIPLE_DB
+        value: "True"
+      - key: DB_SIZE_LIMIT
+        value: "480"
+
+      # ── Verification ──────────────────────────────────────────
+      - key: IS_VERIFY
+        value: "True"
+      - key: AUTH_CHANNELS
+        value: "Univora88"
+
+      # ── Stream Server ─────────────────────────────────────────
+      # IMPORTANT: After deploy, update FQDN to your actual Render URL
+      # e.g.  cinemahub-bot.onrender.com
+      - key: STREAM_MODE
+        value: "True"
+      - key: PREMIUM_STREAM_MODE
+        value: "False"
+      - key: FQDN
+        value: "cinemahub-bot.onrender.com"
+      - key: HAS_SSL
+        value: "True"
+      - key: NO_PORT
+        value: "True"

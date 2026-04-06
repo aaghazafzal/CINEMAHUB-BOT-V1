@@ -6,7 +6,7 @@ from pymongo.errors import DuplicateKeyError
 
 class Database:    
     def __init__(self, uri, database_name):
-        self._client = motor.motor_asyncio.AsyncIOMotorClient(uri)
+        self._client = motor.motor_asyncio.AsyncIOMotorClient(uri, maxPoolSize=500)
         self.db = self._client[database_name]
         # Collections
         self.col = self.db.users

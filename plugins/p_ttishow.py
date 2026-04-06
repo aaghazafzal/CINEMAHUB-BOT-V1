@@ -15,40 +15,52 @@ from bot import botStartTime
 
 """-----------------------------------------https://t.me/dreamxbotz--------------------------------------"""
 
+from pyrogram.enums import ChatMemberStatus, ChatType
+
 @Client.on_message(filters.new_chat_members & filters.group)
 async def save_group(bot, message):
     dreamx_check = [u.id for u in message.new_chat_members]
     if temp.ME in dreamx_check:
-        if not await db.get_chat(message.chat.id):
-            total=await bot.get_chat_members_count(message.chat.id)
-            dreamx_botz = message.from_user.mention if message.from_user else "Anonymous" 
-            await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_G.format(message.chat.title, message.chat.id, total, dreamx_botz))       
-            await db.add_chat(message.chat.id, message.chat.title)
-        if message.chat.id in temp.BANNED_CHATS:
+        chat = message.chat
+        adder = message.from_user.mention if message.from_user else "Anonymous"
+        try:
+            total = await bot.get_chat_members_count(chat.id)
+        except:
+            total = "Unknown"
 
+        # Log: new group or re-added
+        exists = await db.get_chat(chat.id)
+        if not exists:
+            await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_G.format(chat.title, chat.id, total, adder))
+            await db.add_chat(chat.id, chat.title)
+        else:
+            await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_G_READD.format(chat.title, chat.id, total, adder))
+
+        # Banned group check
+        if chat.id in temp.BANNED_CHATS:
             buttons = [[InlineKeyboardButton('📌 ᴄᴏɴᴛᴀᴄᴛ ꜱᴜᴘᴘᴏʀᴛ 📌', url=OWNER_LNK)]]
-            reply_markup=InlineKeyboardMarkup(buttons)
-            k = await message.reply(text='<b>ᴄʜᴀᴛ ɴᴏᴛ ᴀʟʟᴏᴡᴇᴅ 🐞\n\nᴍʏ ᴀᴅᴍɪɴꜱ ʜᴀꜱ ʀᴇꜱᴛʀɪᴄᴛᴇᴅ ᴍᴇ ꜰʀᴏᴍ ᴡᴏʀᴋɪɴɢ ʜᴇʀᴇ ! ɪꜰ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴋɴᴏᴡ ᴍᴏʀᴇ ᴀʙᴏᴜᴛ ɪᴛ ᴄᴏɴᴛᴀᴄᴛ ꜱᴜᴘᴘᴏʀᴛ.</b>',reply_markup=reply_markup,)
+            reply_markup = InlineKeyboardMarkup(buttons)
+            k = await message.reply(
+                text='<b>ᴄʜᴀᴛ ɴᴏᴛ ᴀʟʟᴏᴡᴇᴅ 🐞\n\nᴍʏ ᴀᴅᴍɪɴꜱ ʜᴀꜱ ʀᴇꜱᴛʀɪᴄᴛᴇᴅ ᴍᴇ ꜰʀᴏᴍ ᴡᴏʀᴋɪɴɢ ʜᴇʀᴇ ! ɪꜰ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴋɴᴏᴡ ᴍᴏʀᴇ ᴀʙᴏᴜᴛ ɪᴛ ᴄᴏɴᴛᴀᴄᴛ ꜱᴜᴘᴘᴏʀᴛ.</b>',
+                reply_markup=reply_markup)
             try:
                 await k.pin()
             except:
                 pass
-            await bot.leave_chat(message.chat.id)
+            await bot.leave_chat(chat.id)
             return
-        buttons = [[
-                    InlineKeyboardButton("👩‍🌾 Bot Owner 👩‍🌾", url=OWNER_LNK)
-                  ]]
-        reply_markup=InlineKeyboardMarkup(buttons)
+
+        buttons = [[InlineKeyboardButton("👩‍🌾 Bot Owner 👩‍🌾", url=OWNER_LNK)]]
+        reply_markup = InlineKeyboardMarkup(buttons)
         await message.reply_text(
-            text=f"<b>Thankyou For Adding Me In {message.chat.title} ❣️\n\nIf you have any questions & doubts about using me contact support.</b>",
+            text=f"<b>Thankyou For Adding Me In {chat.title} ❣️\n\nIf you have any questions & doubts about using me contact support.</b>",
             reply_markup=reply_markup)
         try:
-            await db.connect_group(message.chat.id, message.from_user.id)
+            await db.connect_group(chat.id, message.from_user.id)
         except Exception as e:
             logging.error(f"DB error connecting group: {e}")
     else:
         settings = await get_settings(message.chat.id)
-
         if settings.get("welcome"):
             for u in message.new_chat_members:
                 if temp.MELCOW.get('welcome'):
@@ -61,9 +73,8 @@ async def save_group(bot, message):
                         photo=MELCOW_PHOTO,
                         caption=script.MELCOW_ENG.format(u.mention, message.chat.title),
                         reply_markup=InlineKeyboardMarkup([
-                                [
-                                    InlineKeyboardButton("📌 ᴄᴏɴᴛᴀᴄᴛ ꜱᴜᴘᴘᴏʀᴛ 📌", url=OWNER_LNK)
-                                ]]),parse_mode=enums.ParseMode.HTML)
+                            [InlineKeyboardButton("📌 ᴄᴏɴᴛᴀᴄᴛ ꜱᴜᴘᴘᴏʀᴛ 📌", url=OWNER_LNK)]
+                        ]), parse_mode=enums.ParseMode.HTML)
                 except Exception as e:
                     print(f"Welcome photo send failed: {e}")
         if settings.get("auto_delete"):
@@ -71,10 +82,64 @@ async def save_group(bot, message):
             try:
                 if temp.MELCOW.get('welcome'):
                     await temp.MELCOW['welcome'].delete()
-                    temp.MELCOW['welcome'] = None 
+                    temp.MELCOW['welcome'] = None
             except:
                 pass
                
+# ── ChatMemberUpdated: Handles Admin-add (group), Channel add, Re-add, and ALL removals ──
+@Client.on_chat_member_updated(filters.group | filters.channel)
+async def log_new_chat(bot, update):
+    new = update.new_chat_member
+    old = update.old_chat_member
+    if not new or not new.user.is_self:
+        return  # Not about the bot, ignore
+
+    chat = update.chat
+    actor = update.from_user.mention if update.from_user else "Anonymous"
+    is_channel = chat.type == ChatType.CHANNEL
+    is_group = chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]
+
+    try:
+        total = await bot.get_chat_members_count(chat.id)
+    except:
+        total = "Unknown"
+
+    # ── BOT ADDED / RE-ADDED ──
+    if new.status in [ChatMemberStatus.MEMBER, ChatMemberStatus.ADMINISTRATOR]:
+        if is_channel:
+            # Channels always handled here (no new_chat_members event for channels)
+            exists = await db.get_chat(chat.id)
+            if not exists:
+                await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_C.format(chat.title, chat.id, total, actor))
+                await db.add_chat(chat.id, chat.title)
+            else:
+                await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_G_READD.format(chat.title, chat.id, total, actor))
+
+        elif is_group:
+            # For groups: only fire here if old status was kicked/banned/left (i.e. re-add)
+            # Normal add is already handled by new_chat_members event (save_group)
+            old_status = old.status if old else None
+            if old_status in [ChatMemberStatus.BANNED, ChatMemberStatus.LEFT, ChatMemberStatus.RESTRICTED]:
+                exists = await db.get_chat(chat.id)
+                if not exists:
+                    await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_G.format(chat.title, chat.id, total, actor))
+                    await db.add_chat(chat.id, chat.title)
+                else:
+                    await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_G_READD.format(chat.title, chat.id, total, actor))
+            # Always connect group to the adder
+            if update.from_user:
+                try:
+                    await db.connect_group(chat.id, update.from_user.id)
+                except Exception as e:
+                    logging.error(f"DB connect_group error: {e}")
+
+    # ── BOT REMOVED / KICKED ──
+    elif new.status in [ChatMemberStatus.BANNED, ChatMemberStatus.LEFT, ChatMemberStatus.RESTRICTED]:
+        if is_channel:
+            await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_REMOVE_C.format(chat.title, chat.id, actor))
+        elif is_group:
+            await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_REMOVE_G.format(chat.title, chat.id, actor))
+
 @Client.on_message(filters.command('leave') & filters.user(ADMINS))
 async def leave_a_chat(bot, message):
     if len(message.command) == 1:
@@ -159,60 +224,108 @@ async def re_enable_chat(bot, message):
 @Client.on_message(filters.command('stats') & filters.user(ADMINS))
 async def get_stats(bot, message):
     try:
-        msg = await message.reply('<b>📊 ɢᴀᴛʜᴇʀɪɴɢ sᴛᴀᴛs, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...</b>')
+        msg = await message.reply("<b>📊 ɢᴀᴛʜᴇʀɪɴɢ ꜱᴛᴀᴛꜱ ꜰʀᴏᴍ ᴀʟʟ ᴅʙꜱ... ⏳</b>")
 
-        # User & group data
-        total_users = await db.total_users_count()
-        total_chats = await db.total_chat_count()
-        premium = await db.all_premium_users()
-        banned_users, banned_chats = await db.get_banned()
-        banned_users_count = len(banned_users)
-        banned_chats_count = len(banned_chats)
+        # ── User / Group Stats ──
+        total_users, total_chats, banned_data = await asyncio.gather(
+            db.total_users_count(),
+            db.total_chat_count(),
+            db.get_banned()
+        )
+        banned_users_count = len(banned_data[0])
+        banned_chats_count = len(banned_data[1])
+        try:
+            premium = await db.all_premium_users()
+        except:
+            premium = "N/A"
 
-        # File data
-        file1 = await Media.count_documents()
 
-        # DB size (MongoDB Atlas free = 512 MB cap)
-        DB_SIZE_CAP = 512 * 1024 * 1024
-        dbstats = await db_stats.command("dbStats")
-        db_size = dbstats['dataSize'] + dbstats['indexSize']
-        db_free = max(DB_SIZE_CAP - db_size, 0)
-        db_usage_pct = round((db_size / DB_SIZE_CAP) * 100, 1)
-
-        # Bot uptime
-        uptime = get_readable_time(time() - botStartTime)
-
-        # System: RAM, CPU
-        ram = psutil.virtual_memory().percent
-        cpu = psutil.cpu_percent(interval=0.5)
-
-        # Disk
-        disk = psutil.disk_usage('/')
-        disk_used = get_size(disk.used)
+        # ── System Stats ──
+        uptime    = get_readable_time(time() - botStartTime)
+        ram       = psutil.virtual_memory()
+        cpu       = psutil.cpu_percent(interval=0.5)
+        disk      = psutil.disk_usage('/')
+        ram_pct   = ram.percent
+        ram_used  = get_size(ram.used)
+        ram_total = get_size(ram.total)
+        disk_used  = get_size(disk.used)
         disk_total = get_size(disk.total)
+        disk_pct   = round(disk.percent, 1)
 
-        if MULTIPLE_DB == False:
-            await msg.edit(script.STATUS_TXT.format(
-                total_users, total_chats, premium,
-                banned_users_count, banned_chats_count,
-                file1,
-                get_size(db_size), get_size(db_free), db_usage_pct,
-                uptime, ram, cpu,
-                disk_used, disk_total
-            ))
-            return
+        # ── Per-DB Stats (parallel) ──
+        from database.ia_filterdb import get_all_db_stats
+        db_stats_list = await get_all_db_stats()
 
-        # Multi-DB path (unchanged logic)
-        file2 = await Media2.count_documents()
-        db2stats = await db2_stats.command("dbStats")
-        db2_size = db2stats['dataSize'] + db2stats['indexSize']
-        free2 = DB_SIZE_CAP - db2_size
-        await msg.edit(script.MULTI_STATUS_TXT.format(
-            total_users, total_chats, premium, file1, get_size(db_size), get_size(db_free),
-            file2, get_size(db2_size), get_size(free2), uptime, ram, cpu, (int(file1) + int(file2))
-        ))
+        FREE_TIER_MB    = 512.0
+        total_files_all = sum(s["files"]   for s in db_stats_list)
+        total_used_mb   = sum(s["size_mb"] for s in db_stats_list)
+        total_free_mb   = sum(s["free_mb"] for s in db_stats_list)
+        total_cap_mb    = FREE_TIER_MB * len(db_stats_list)
+        total_pct       = round((total_used_mb / total_cap_mb) * 100, 1) if total_cap_mb else 0
+
+        # ── Build DB section ──
+        def _bar(pct, length=10):
+            filled = int(length * pct / 100)
+            return '🟩' * filled + '⬜' * (length - filled)
+
+        db_lines = ""
+        for s in db_stats_list:
+            if s.get("error"):
+                db_lines += (
+                    f"\n<b>├──[ 🗄 ᴅᴀᴛᴀʙᴀꜱᴇ {s['index']} ]</b>\n"
+                    f"│ └ ⚠️ <b>Error:</b> <code>{s['error']}</code>\n"
+                )
+            else:
+                icon  = "🔴" if s["pct"] >= 90 else ("🟡" if s["pct"] >= 70 else "🟢")
+                bar   = _bar(s["pct"])
+                db_lines += (
+                    f"\n<b>├──[ 🗄 ᴅᴀᴛᴀʙᴀꜱᴇ {s['index']} ]</b>\n"
+                    f"│ ├ 📁 ꜰɪʟᴇꜱ    ‣ <code>{s['files']:,}</code>\n"
+                    f"│ ├ 💾 ᴜꜱᴇᴅ     ‣ <code>{s['size_mb']} MB</code>\n"
+                    f"│ ├ 🆓 ꜰʀᴇᴇ    ‣ <code>{s['free_mb']} MB</code>\n"
+                    f"│ ├ {icon} ᴜꜱᴀɢᴇ   ‣ <code>{s['pct']}%</code>\n"
+                    f"│ └ {bar} <code>{s['pct']}%</code>\n"
+                )
+
+
+        text = (
+            f"<b>╔══[ 🏆 ᴄɪɴᴇᴍᴀʜᴜʙ ʙᴏᴛ — ꜰᴜʟʟ ꜱᴛᴀᴛꜱ ]══⍟</b>\n"
+            f"│\n"
+            f"<b>├──[ 👥 ᴜꜱᴇʀ & ɢʀᴏᴜᴘ ᴅᴀᴛᴀ ]</b>\n"
+            f"├⋟ ᴛᴏᴛᴀʟ ᴜꜱᴇʀꜱ   ‣ <code>{total_users:,}</code>\n"
+            f"├⋟ ᴛᴏᴛᴀʟ ɢʀᴏᴜᴘꜱ  ‣ <code>{total_chats:,}</code>\n"
+            f"├⋟ ᴘʀᴇᴍɪᴜᴍ       ‣ <code>{premium}</code>\n"
+            f"├⋟ ʙᴀɴɴᴇᴅ ᴜꜱᴇʀꜱ  ‣ <code>{banned_users_count}</code>\n"
+            f"├⋟ ʙᴀɴɴᴇᴅ ɢʀᴏᴜᴘꜱ ‣ <code>{banned_chats_count}</code>\n"
+            f"│\n"
+            f"<b>├──[ 🗃 ᴅᴀᴛᴀʙᴀꜱᴇ ꜱᴜᴍᴍᴀʀʏ ({len(db_stats_list)} ᴅʙꜱ ᴀᴄᴛɪᴠᴇ) ]</b>\n"
+            f"├⋟ ᴛᴏᴛᴀʟ ꜰɪʟᴇꜱ   ‣ <code>{total_files_all:,}</code>\n"
+            f"├⋟ ᴛᴏᴛᴀʟ ᴜꜱᴇᴅ    ‣ <code>{round(total_used_mb,1)} MB</code>\n"
+            f"├⋟ ᴛᴏᴛᴀʟ ꜰʀᴇᴇ    ‣ <code>{round(total_free_mb,1)} MB</code>\n"
+            f"├⋟ ᴛᴏᴛᴀʟ ᴄᴀᴘ     ‣ <code>{round(total_cap_mb,0)} MB ({len(db_stats_list)} × 512 MB)</code>\n"
+            f"├⋟ ᴏᴠᴇʀᴀʟʟ ᴜꜱᴀɢᴇ ‣ <code>{total_pct}%</code>  {_bar(total_pct)}\n"
+            f"│\n"
+            f"<b>├──[ 🗂 ᴘᴇʀ-ᴅᴀᴛᴀʙᴀꜱᴇ ᴅᴇᴛᴀɪʟꜱ ]</b>\n"
+            f"{db_lines}"
+            f"│\n"
+            f"<b>├──[ 🖥️ ꜱʏꜱᴛᴇᴍ ɪɴꜰᴏ ]</b>\n"
+            f"├⋟ ʙᴏᴛ ᴜᴘᴛɪᴍᴇ  ‣ <code>{uptime}</code>\n"
+            f"├⋟ ʀᴀᴍ ᴜꜱᴇᴅ    ‣ <code>{ram_used} / {ram_total} ({ram_pct}%)</code>  {_bar(ram_pct)}\n"
+            f"├⋟ ᴄᴘᴜ ᴜꜱᴀɢᴇ   ‣ <code>{cpu}%</code>  {_bar(cpu)}\n"
+            f"├⋟ ᴅɪꜱᴋ ᴜꜱᴇᴅ   ‣ <code>{disk_used} / {disk_total} ({disk_pct}%)</code>  {_bar(disk_pct)}\n"
+            f"│\n"
+            f"<b>╚═══════════════════════════════⍟</b>"
+        )
+
+        await msg.edit(text, parse_mode=enums.ParseMode.HTML)
+
     except Exception as e:
-        print(f"Error In stats :- {e}")
+        logger.error(f"Error In /stats: {e}")
+        try:
+            await msg.edit(f"<b>Error: <code>{e}</code></b>")
+        except:
+            pass
+
 
 @Client.on_message(filters.command('invite') & filters.user(ADMINS))
 async def gen_invite(bot, message):

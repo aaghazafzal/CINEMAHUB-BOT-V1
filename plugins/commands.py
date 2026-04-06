@@ -162,44 +162,56 @@ async def start(client, message):
         return
     if message.command[1].startswith("reff_"):
         try:
-            user_id = int(message.command[1].split("_")[1])
+            referrer_id = int(message.command[1].split("_")[1])
         except ValueError:
-            await message.reply_text("Invalid refer!")
+            await message.reply_text("❌ Invalid refer link!")
             return
-        if user_id == message.from_user.id:
-            await message.reply_text("Hᴇʏ Dᴜᴅᴇ, Yᴏᴜ Cᴀɴ'ᴛ Rᴇғᴇʀ Yᴏᴜʀsᴇʟғ 🤣!\n\nsʜᴀʀᴇ ʟɪɴᴋ ʏᴏᴜʀ ғʀɪᴇɴᴅ ᴀɴᴅ ɢᴇᴛ 10 ʀᴇғᴇʀʀᴀʟ ᴘᴏɪɴᴛ ɪғ ʏᴏᴜ ᴀʀᴇ ᴄᴏʟʟᴇᴄᴛɪɴɢ 100 ʀᴇғᴇʀʀᴀʟ ᴘᴏɪɴᴛs ᴛʜᴇɴ ʏᴏᴜ ᴄᴀɴ ɢᴇᴛ 1 ᴍᴏɴᴛʜ ғʀᴇᴇ ᴘʀᴇᴍɪᴜᴍ ᴍᴇᴍʙᴇʀsʜɪᴘ.")
+        if referrer_id == message.from_user.id:
+            await message.reply_text(
+                "😂 ᴀʀᴇ ʙʜᴀɪ, ᴀᴘɴᴇ ᴀᴀᴘ ᴋᴏ ʀᴇꜰᴇʀ ɴᴀʜɪ ᴋᴀʀ ꜱᴀᴋᴛᴇ!\n\n"
+                "📤 ᴀᴘɴᴇ ᴅᴏꜱᴛᴏɴ ᴋᴏ ꜱʜᴀʀᴇ ᴋᴀʀᴏ ᴀᴜʀ ʜᴀʀ ʀᴇꜰᴇʀ ᴘᴀʀ 1 ᴘᴏɪɴᴛ ᴘᴀᴏ.\n"
+                "🎁 10 ᴘᴏɪɴᴛ = 10 ᴅɪɴ ᴘʀᴇᴍɪᴜᴍ\n"
+                "🏆 20 ᴘᴏɪɴᴛ = 30 ᴅɪɴ ᴘʀᴇᴍɪᴜᴍ"
+            )
             return
         if referdb.is_user_in_list(message.from_user.id):
-            await message.reply_text("Yᴏᴜ ʜᴀᴠᴇ ʙᴇᴇɴ ᴀʟʀᴇᴀᴅʏ ɪɴᴠɪᴛᴇᴅ ❗")
+            await message.reply_text("⚠️ ᴀᴀᴘ ᴘᴀʜʟᴇ ʜɪ ᴋɪꜱɪ ᴋᴇ ʀᴇꜰᴇʀʀᴀʟ ꜱᴇ ᴊᴏɪɴ ʜᴏ ᴄʜᴜᴋᴇ ʜᴀɪɴ!")
             return
-        if await db.is_user_exist(message.from_user.id): 
-            await message.reply_text("‼️ Yᴏᴜ Hᴀᴠᴇ Bᴇᴇɴ Aʟʀᴇᴀᴅʏ Iɴᴠɪᴛᴇᴅ ᴏʀ Jᴏɪɴᴇᴅ")
-            return 
+        if await db.is_user_exist(message.from_user.id):
+            await message.reply_text("⚠️ ᴀᴀᴘ ᴘᴀʜʟᴇ ʜɪ ʙᴏᴛ ᴜꜱᴇ ᴋᴀʀ ʀᴀʜᴇ ʜᴀɪɴ!")
+            return
         try:
-            uss = await client.get_users(user_id)
+            referrer = await client.get_users(referrer_id)
         except Exception:
-            return 	    
+            return
+        # Register new user as referred
         referdb.add_user(message.from_user.id)
-        fromuse = referdb.get_refer_points(user_id) + 10
-        if fromuse == 100:
-            referdb.add_refer_points(user_id, 0) 
-            await message.reply_text(f"🎉 𝗖𝗼𝗻𝗴𝗿𝗮𝘁𝘂𝗹𝗮𝘁𝗶𝗼𝗻𝘀! 𝗬𝗼𝘂 𝘄𝗼𝗻 𝟭𝟬 𝗥𝗲𝗳𝗲𝗿𝗿𝗮𝗹 𝗽𝗼𝗶𝗻𝘁 𝗯𝗲𝗰𝗮𝘂𝘀𝗲 𝗬𝗼𝘂 𝗵𝗮𝘃𝗲 𝗯𝗲𝗲𝗻 𝗦𝘂𝗰𝗰𝗲𝘀𝘀𝗳𝘂𝗹𝗹𝘆 𝗜𝗻𝘃𝗶𝘁𝗲𝗱 ☞ {uss.mention}!")		    
-            await message.reply_text(user_id, f"You have been successfully invited by {message.from_user.mention}!") 	
-            seconds = 2592000
-            if seconds > 0:
-                expiry_time = datetime.datetime.now() + datetime.timedelta(seconds=seconds)
-                user_data = {"id": user_id, "expiry_time": expiry_time}  # Using "id" instead of "user_id"  
-                await db.update_user(user_data)  # Use the update_user method to update or insert user data		    
-                await client.send_message(
-                chat_id=user_id,
-                text=f"<b>Hᴇʏ {uss.mention}\n\nYᴏᴜ ɢᴏᴛ 1 ᴍᴏɴᴛʜ ᴘʀᴇᴍɪᴜᴍ sᴜʙsᴄʀɪᴘᴛɪᴏɴ ʙʏ ɪɴᴠɪᴛɪɴɢ 10 ᴜsᴇʀs ❗", disable_web_page_preview=True              
-                )
-            for admin in ADMINS:
-                await client.send_message(chat_id=admin, text=f"Sᴜᴄᴄᴇss ғᴜʟʟʏ ᴛᴀsᴋ ᴄᴏᴍᴘʟᴇᴛᴇᴅ ʙʏ ᴛʜɪs ᴜsᴇʀ:\n\nuser Nᴀᴍᴇ: {uss.mention}\n\nUsᴇʀ ɪᴅ: {uss.id}!")	
-        else:
-            referdb.add_refer_points(user_id, fromuse)
-            await message.reply_text(f"You have been successfully invited by {uss.mention}!")
-            await client.send_message(user_id, f"𝗖𝗼𝗻𝗴𝗿𝗮𝘁𝘂𝗹𝗮𝘁𝗶𝗼𝗻𝘀! 𝗬𝗼𝘂 𝘄𝗼𝗻 𝟭𝟬 𝗥𝗲𝗳𝗲𝗿𝗿𝗮𝗹 𝗽𝗼𝗶𝗻𝘁 𝗯𝗲𝗰𝗮𝘂𝘀𝗲 𝗬𝗼𝘂 𝗵𝗮𝘃𝗲 𝗯𝗲𝗲𝗻 𝗦𝘂𝗰𝗰𝗲𝘀𝘀𝗳𝘂𝗹𝗹𝘆 𝗜𝗻𝘃𝗶𝘁𝗲𝗱 ☞{message.from_user.mention}!")
+        # Give referrer exactly +1 point
+        new_points = referdb.increment_refer_point(referrer_id)
+        referdb.increment_total_refers(referrer_id)
+        # Notify the new user
+        await message.reply_text(
+            f"🎉 ᴡᴇʟᴄᴜᴍ! ᴀᴀᴘ <b>{referrer.mention}</b> ᴋᴇ ʀᴇꜰᴇʀʀᴀʟ ꜱᴇ ᴊᴏɪɴ ʜᴜᴇ ʜᴀɪɴ!\n\n"
+            "🎬 ᴀʙ ᴀᴀᴘ ʙʜɪ /plan ᴋᴏ ᴅᴇᴋʜᴏ ᴀᴜʀ ᴘʀᴇᴍɪᴜᴍ ʟᴏ!",
+            parse_mode=enums.ParseMode.HTML
+        )
+        # Notify the referrer
+        milestone_msg = ""
+        if new_points == 10:
+            milestone_msg = "\n\n🔔 <b>10 ᴘᴏɪɴᴛ ᴘᴏᴏʀᴇ!</b> /plan → Refer Card → Claim ᴋᴀʀᴋᴇ 10 ᴅɪɴ ᴘʀᴇᴍɪᴜᴍ ᴘᴀᴏ! 🎁"
+        elif new_points == 20:
+            milestone_msg = "\n\n🏆 <b>20 ᴘᴏɪɴᴛ ᴘᴏᴏʀᴇ!</b> /plan → Refer Card → Claim ᴋᴀʀᴋᴇ 30 ᴅɪɴ ᴘʀᴇᴍɪᴜᴍ ᴘᴀᴏ! 🎁"
+        try:
+            await client.send_message(
+                chat_id=referrer_id,
+                text=(
+                    f"👥 <b>{message.from_user.mention}</b> ᴀᴀᴘᴋᴇ ʀᴇꜰᴇʀʀᴀʟ ꜱᴇ ᴊᴏɪɴ ʜᴜᴀ!\n"
+                    f"⭐ ᴀᴀᴘᴋᴏ +1 ᴘᴏɪɴᴛ ᴍɪʟᴀ. ᴀʙ ᴀᴀᴘᴋᴇ ᴘᴀꜱ: <code>{new_points}</code> ᴘᴏɪɴᴛ{milestone_msg}"
+                ),
+                parse_mode=enums.ParseMode.HTML
+            )
+        except Exception:
+            pass
         return
         
     if len(message.command) == 2 and message.command[1] in ["premium"]:

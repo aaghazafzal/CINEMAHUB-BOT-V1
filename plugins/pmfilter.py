@@ -1486,6 +1486,22 @@ async def cb_handler(client: Client, query: CallbackQuery):
         try:
             user_id = query.from_user.id
             username = query.from_user.mention
+            from database.users_chats_db import db as userdb
+            is_premium = (user_id in ADMINS) or (await userdb.has_premium_access(user_id))
+            if not is_premium:
+                await query.answer(text=script.PRE_STREAM_ALERT, show_alert=True)
+                dreamcinezone = await client.send_photo(
+                    chat_id=query.message.chat.id,
+                    photo="https://i.ibb.co/whf8xF7j/photo-2025-07-26-10-42-46-7531339305176793100.jpg",
+                    caption=script.PRE_STREAM,
+                    reply_markup=InlineKeyboardMarkup([
+                        [InlineKeyboardButton("🚀 Buy Premium 🚀", callback_data="premium_info")]
+                    ])
+                )
+                await asyncio.sleep(DELETE_TIME)
+                await dreamcinezone.delete()
+                return
+
             log_msg = await client.send_cached_media(chat_id=BIN_CHANNEL, file_id=file_id,)
             fileName = {quote_plus(get_name(log_msg))}
             dreamx_stream = f"{URL}watch/{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}"

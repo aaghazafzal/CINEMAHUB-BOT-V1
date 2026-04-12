@@ -291,7 +291,9 @@ async def start(client, message):
             settings = await get_settings(grp_id)
             is_second_shortener = await db.use_second_shortener(user_id, settings.get('verify_time', TWO_VERIFY_GAP)) 
             is_third_shortener = await db.use_third_shortener(user_id, settings.get('third_verify_time', THREE_VERIFY_GAP))
-            if settings.get("is_verify", IS_VERIFY) and (not user_verified or is_second_shortener or is_third_shortener):
+            bot_id = client.me.id
+            global_shortener_enabled = await db.get_bot_setting(bot_id, "GLOBAL_SHORTENER", True)
+            if global_shortener_enabled and settings.get("is_verify", IS_VERIFY) and (not user_verified or is_second_shortener or is_third_shortener):
                 verify_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
                 await db.create_verify_id(user_id, verify_id)
                 temp.VERIFICATIONS[user_id] = grp_id
@@ -1391,3 +1393,13 @@ async def reset_trial(client, message):
         await message.reply_text(message_text)
     except Exception as e:
         await message.reply_text(f"An error occurred: {e}")
+
+@Client.on_message(filters.command("global_shortener") & filters.user(ADMINS))
+async def toggle_global_shortener(client, message):
+    from database.users_chats_db import db
+    bot_id = client.me.id
+    current_status = await db.get_bot_setting(bot_id, "GLOBAL_SHORTENER", True)
+    new_status = not current_status
+    await db.update_bot_setting(bot_id, "GLOBAL_SHORTENER", new_status)
+    status_text = "ON 🟢" if new_status else "OFF 🔴"
+    await message.reply_text(f"✅ **Master Switch:** Global Shortener has been turned **{status_text}** for everyone.")

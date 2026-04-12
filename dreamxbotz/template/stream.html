@@ -1522,8 +1522,10 @@
             <div class="banner-overlay">
                 <div class="banner-text">
                     <h3>🎬 CinemaHub Premium Bot</h3>
-                    <p>Get instant streaming links for any Telegram file — movies, episodes, music. Zero wait.</p>
-                    <a href="https://t.me/rolexsir_8" class="banner-link"><i class="fab fa-telegram"></i> Open in
+                    <p>Get instant streaming links for any Telegram file — movies, episodes, dramas, anime. Zero wait.
+                    </p>
+                    <a href="https://t.me/Univora_CinemahubBot" class="banner-link"><i class="fab fa-telegram"></i> Open
+                        in
                         Telegram</a>
                 </div>
             </div>
@@ -1747,27 +1749,11 @@
 
         // ── Download ──
         function blazeDownload() {
-            try {
-                const urlObj = new URL(FILE_URL, window.location.origin);
-                urlObj.searchParams.set('download', 'true');
-                const a = document.createElement('a');
-                a.href = urlObj.toString();
-                a.download = '{{file_name}}';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                notify('⬇️ Download started!');
-            } catch (e) {
-                // Fallback if URL parsing fails
-                const joiner = FILE_URL.includes('?') ? '&' : '?';
-                const a = document.createElement('a');
-                a.href = FILE_URL + joiner + 'download=true';
-                a.download = '{{file_name}}';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                notify('⬇️ Download started!');
-            }
+            const a = document.createElement('a');
+            a.href = FILE_URL + '?download=true';
+            a.download = '{{file_name}}';
+            a.click();
+            notify('⬇️ Download started!');
         }
 
         // ── Copy URL ──

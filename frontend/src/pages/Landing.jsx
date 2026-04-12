@@ -52,10 +52,14 @@ export default function Landing() {
       {/* ── HERO ── */}
       <section className="relative min-h-[100dvh] pt-32 pb-20 flex flex-col items-center justify-center overflow-hidden">
         {/* Cinematic Background Parallax */}
-        <motion.div style={{ y: yBg, opacity: opacityBg }} className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-transparent to-[#050505] z-10"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-transparent to-[#050505] z-10"></div>
-          <img src={netflixBanner} alt="Hero" className="w-full h-full object-cover object-top scale-110" />
+        <motion.div style={{ y: yBg, opacity: opacityBg }} className="absolute inset-0 z-0 h-[120%] -top-[10%] pointer-events-none">
+          {/* Smooth Vertical Fades */}
+          <div className="absolute top-0 w-full h-[30%] bg-gradient-to-b from-[#050505] to-transparent z-10"></div>
+          <div className="absolute bottom-0 w-full h-[50%] bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent z-10"></div>
+          {/* Smooth Horizontal Fades */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-transparent to-[#050505] z-10 opacity-70"></div>
+          <div className="absolute inset-0 bg-[#050505]/40 z-10"></div>
+          <img src={netflixBanner} alt="Hero" className="w-full h-full object-cover object-center opacity-60 mix-blend-screen" />
         </motion.div>
         
         {/* Glow Effects */}

@@ -200,6 +200,8 @@ def extract_media_info(filename: str, caption: str):
 
 @Client.on_message(filters.chat(CHANNELS) & MEDIA_FILTER)
 async def media_handler(bot, message):
+    if not await db.get_bot_setting(bot.me.id, "AUTO_INDEX", True):
+        return
     media = next(
         (getattr(message, ft) for ft in ("document", "video", "audio")
          if getattr(message, ft, None)),

@@ -135,6 +135,11 @@ def get_progress_bar(percent, length=10):
 @Client.on_message(filters.command('index_stats') & filters.user(ADMINS))
 async def get_index_stats(bot, message):
     from info import CHANNELS
+    from database.users_chats_db import db as user_db
+    
+    auto_status = await user_db.get_bot_setting(bot.me.id, "AUTO_INDEX", True)
+    auto_text = "ENABLED ✅" if auto_status else "DISABLED ❌"
+    
     active = ""
     if ACTIVE_INDEX:
         for chat_id, data in ACTIVE_INDEX.items():
@@ -152,14 +157,26 @@ async def get_index_stats(bot, message):
     text = (
         f"🛠 **Indexing Control Panel**\n"
         f"━━━━━━━━━━━━━━━\n"
-        f"📢 **Auto-Index Channels:**\n{ch_list}\n"
+        f"📢 **Auto-Index:** {auto_text}\n"
+        f"📍 **Monitoring Channels:**\n{ch_list}\n"
         f"{active}\n"
         f"━━━━━━━━━━━━━━━\n"
-        f"💡 *Files in Render logs are usually from Auto-Index channels.*"
+        f"💡 *Use /auto_index to toggle Auto-Indexing.*"
     )
     
-    btn = [[InlineKeyboardButton("🛑 STOP MANUAL INDEX", callback_data="index_cancel")]]
+    btn = [
+        [InlineKeyboardButton("🛑 STOP MANUAL INDEX", callback_data="index_cancel")],
+        [InlineKeyboardButton("🔄 TOGGLE AUTO-INDEX", callback_data="toggle_auto_index_cb")]
+    ]
     await message.reply_text(text, reply_markup=InlineKeyboardMarkup(btn))
+
+@Client.on_callback_query(filters.regex("toggle_auto_index_cb"))
+async def toggle_auto_index_cb(bot, query):
+    from database.users_chats_db import db as user_db
+    current_status = await user_db.get_bot_setting(bot.me.id, "AUTO_INDEX", True)
+    await user_db.update_bot_setting(bot.me.id, "AUTO_INDEX", not current_status)
+    await query.answer(f"Auto Indexing {'Disabled' if current_status else 'Enabled'}", show_alert=True)
+    await get_index_stats(bot, query.message)
 
 @Client.on_message(filters.command('stop_indexing') & filters.user(ADMINS))
 async def stop_indexing_cmd(bot, message):

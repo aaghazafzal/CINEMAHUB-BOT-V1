@@ -1400,6 +1400,11 @@ async def toggle_global_shortener(client, message):
     bot_id = client.me.id
     current_status = await db.get_bot_setting(bot_id, "GLOBAL_SHORTENER", True)
     new_status = not current_status
-    await db.update_bot_setting(bot_id, "GLOBAL_SHORTENER", new_status)
-    status_text = "ON 🟢" if new_status else "OFF 🔴"
-    await message.reply_text(f"✅ **Master Switch:** Global Shortener has been turned **{status_text}** for everyone.")
+    await db.update_bot_setting(client.me.id, "GLOBAL_SHORTENER", not current_status)
+    await message.reply_text(f"✅ Global Shortener has been <b>{'DISABLED' if current_status else 'ENABLED'}</b> globally.")
+
+@Client.on_message(filters.command("auto_index") & filters.user(ADMINS))
+async def toggle_auto_index(client, message):
+    current_status = await db.get_bot_setting(client.me.id, "AUTO_INDEX", True)
+    await db.update_bot_setting(client.me.id, "AUTO_INDEX", not current_status)
+    await message.reply_text(f"✅ Auto Indexing from channels has been <b>{'DISABLED' if current_status else 'ENABLED'}</b>.")

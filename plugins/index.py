@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 lock = asyncio.Lock()
+ACTIVE_INDEX = {} # Track active indexing: {chat_id: {progress, total, status}}
+
 
 @Client.on_callback_query(filters.regex(r'^index'))
 async def index_files(bot, query):
@@ -130,6 +132,42 @@ def get_progress_bar(percent, length=10):
     unfilled = length - filled
     return '🟩' * filled + '⬜️' * unfilled
 
+@Client.on_message(filters.command('index_stats') & filters.user(ADMINS))
+async def get_index_stats(bot, message):
+    from info import CHANNELS
+    active = ""
+    if ACTIVE_INDEX:
+        for chat_id, data in ACTIVE_INDEX.items():
+            active += (
+                f"\n✨ **Active Job:** `{chat_id}`\n"
+                f"📊 Progress: `{data['percent']}%`\n"
+                f"📥 Fetched: `{data['current']}/{data['total']}`\n"
+                f"✅ Saved: `{data['saved']}`\n"
+            )
+    else:
+        active = "\n❌ No manual indexing job running."
+
+    ch_list = "\n".join([f"• `{ch}`" for ch in CHANNELS]) if CHANNELS else "None"
+    
+    text = (
+        f"🛠 **Indexing Control Panel**\n"
+        f"━━━━━━━━━━━━━━━\n"
+        f"📢 **Auto-Index Channels:**\n{ch_list}\n"
+        f"{active}\n"
+        f"━━━━━━━━━━━━━━━\n"
+        f"💡 *Files in Render logs are usually from Auto-Index channels.*"
+    )
+    
+    btn = [[InlineKeyboardButton("🛑 STOP MANUAL INDEX", callback_data="index_cancel")]]
+    await message.reply_text(text, reply_markup=InlineKeyboardMarkup(btn))
+
+@Client.on_message(filters.command('stop_indexing') & filters.user(ADMINS))
+async def stop_indexing_cmd(bot, message):
+    temp.CANCEL = True
+    ACTIVE_INDEX.clear()
+    await message.reply_text("✅ Indexing has been requested to stop.")
+
+
 async def index_files_to_db(lst_msg_id, chat, msg, bot):
     total_files = 0
     duplicate = 0
@@ -146,6 +184,12 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
             temp.CANCEL = False
             total_messages = lst_msg_id
             total_fetch = lst_msg_id - current
+            ACTIVE_INDEX[chat] = {
+                "total": total_fetch,
+                "current": 0,
+                "percent": 0,
+                "saved": 0
+            }
             if total_messages <= 0:
                 await msg.edit(
                     "🚫 No Messages To Index.",
@@ -214,9 +258,13 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
                             errors += 1
                 batch_time = time.time() - batch_start
                 batch_times.append(batch_time)
-                elapsed = time.time() - start_time
                 progress = current - temp.CURRENT
                 percentage = (progress / total_fetch) * 100
+                ACTIVE_INDEX[chat].update({
+                    "current": progress,
+                    "percent": round(percentage, 1),
+                    "saved": total_files
+                })
                 avg_batch_time = sum(batch_times) / len(batch_times) if batch_times else 1
                 eta = (total_fetch - progress) / BATCH_SIZE * avg_batch_time
                 progress_bar = get_progress_bar(int(percentage))
@@ -249,7 +297,9 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
                 f"⏱️ Elapsed: <code>{get_readable_time(elapsed)}</code>",
                 reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('Close', callback_data='close_data')]])
             )
+            ACTIVE_INDEX.pop(chat, None)
         except Exception as e:
+            ACTIVE_INDEX.pop(chat, None)
             await msg.edit(
                 f"❌ Error: <code>{e}</code>",
                 reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('Close', callback_data='close_data')]])

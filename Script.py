@@ -591,7 +591,10 @@ Feel free to use the bot directly or add it to your own groups to enjoy the auto
 • /unban [user_id] - <code>Uɴʙᴀɴ ᴀ ꜱᴘᴇᴄɪꜰɪᴄ ᴜꜱᴇʀ</code>
 • /deletefiles - <code>Dᴇʟᴇᴛᴇ CᴀᴍRɪᴘ ᴀɴᴅ PʀᴇDVD Mᴀꜱꜱ Fɪʟᴇꜱ Pᴜʀɢᴇ</code>
 • /delete - <code>Dᴇʟᴇᴛᴇ ᴀ Sᴘᴇᴄɪꜰɪᴄ Fɪʟᴇ Uꜱɪɴɢ Mᴏɴɢᴏ ID</code>
-• /restart - <code>Rᴇꜱᴛᴀʀᴛ ᴛʜᴇ Eɴᴛɪʀᴇ Sʏꜱᴛᴇᴍ Sᴀꜰᴇʟʏ</code>"""
+• /index_stats - <code>Cʜᴇᴄᴋ ᴀᴄᴛɪᴠᴇ ɪɴᴅᴇxɪɴɢ ᴊᴏʙ sᴛᴀᴛs</code>
+• /stop_indexing - <code>Sᴛᴏᴘ ʀᴜɴɴɪɴɢ ɪɴᴅᴇxɪɴɢ ᴊᴏʙ</code>
+• /restart - <code>Rᴇꜱᴛᴀʀᴛ ᴛʜᴇ Eɴᴛɪʀᴇ Sʏꜱᴛᴇᴍ Sᴀꜰᴇʟʏ</code>
+• /deleteall - <code>Dᴇʟᴇᴛᴇ ᴀʟʟ ꜰɪʟᴇꜱ ꜰʀᴏᴍ ᴛʜᴇ ᴅᴀᴛᴀʙᴀꜱᴇ</code>"""
 
 
 

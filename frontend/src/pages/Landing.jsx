@@ -9,8 +9,8 @@ import logoImg from '../assets/logo.jpg';
 import netflixBanner from '../assets/netflix-banner.jpg';
 
 export default function Landing() {
-  const BOT_LINK = "https://t.me/STREAM_DROP_BOT";
-  const MANAGER_LINK = "https://t.me/Univora_Managerbot";
+  const BOT_LINK = "https://t.me/Univora_CinemahubBot";
+  const MANAGER_LINK = "https://t.me/rolexsir_8";
 
   const FADE_UP = {
     hidden: { opacity: 0, y: 30 },
@@ -23,53 +23,53 @@ export default function Landing() {
 
   const FEATURE_GROUPS = [
     {
-      category: "Streaming & Playback",
-      icon: <MonitorPlay className="text-blue-400" />,
+      category: "Content & Library",
+      icon: <Globe className="text-blue-400" />,
       items: [
-        "1-Click Instant Web Playback", "No External App Required", "Background Playback Support",
-        "Picture-in-Picture Mode", "HLS Adaptive Bitrate Streaming", "Auto-Resume Last Played",
-        "Resume from Specific Timestamp", "Hardware Accelerated UI", "MX Player Native Intent",
-        "VLC Media Player Support"
+        "10 Million+ Movies & Series", "Latest Market Releases Daily", "Exclusive Anime & Drama Library",
+        "Classic Cartoons & Kids Shows", "Instant Global Search", "Categorized Genres",
+        "Multi-language Audio Support", "Built-in Subtitles", "High Quality 4K/1080p",
+        "Request Any Unlisted Movie"
       ]
     },
     {
-      category: "Speed & Performance",
-      icon: <Zap className="text-amber-400" />,
+      category: "Free Streaming",
+      icon: <Sparkles className="text-amber-400" />,
       items: [
-        "Zero Bandwidth Throttling", "Multi-Threaded Video Delivery", "Bypass Telegram Rate Limits",
-        "Edge CDN Server Routing", "Optimized Mobile Buffering", "Minimal Latency Video Start",
-        "Lightweight 5MB App Size", "Lag-Free Javascript Engine", "99.9% Uptime Reliability",
-        "Global Server Availability"
+        "100% Free Forever", "No Hidden Charges", "Unlimited Bandwidth",
+        "Instant Telegram Link Fetch", "Bypass Telegram Limits", "Optimized Mobile Buffering",
+        "Lightweight Player Array", "Background Play Audio", "Deep Links for VLC/MX",
+        "No Forced Subscriptions"
       ]
     },
     {
-      category: "Security & Privacy",
+      category: "Premium Benefits",
       icon: <Shield className="text-emerald-400" />,
       items: [
-        "AES-256 Link Encryption", "HMAC SHA-256 Token Auth", "Dynamic Expiry Timers",
-        "Anti-Hotlinking Protection", "100% Anonymous Downloads", "No User Data Tracking",
-        "IP Address Masking", "Self-Destructing Links", "Bot Abuse Protection",
-        "Secure TLS/SSL Certificates"
+        "Direct Stream in Browser", "1-Click Direct Download", "Zero Advertisements",
+        "Priority Access to New Content", "Ultra-Fast Dedicated CDN Servers", "Premium Member Badge",
+        "Priority Support from @rolexsir_8", "Highest Quality Files Enabled", "Early Access Updates",
+        "Premium Sleep Timer & Settings"
       ]
     },
     {
-      category: "Bot & Automation",
-      icon: <Cpu className="text-purple-400" />,
+      category: "Advanced Playback",
+      icon: <MonitorPlay className="text-purple-400" />,
       items: [
-        "Instant Bot Response Time", "Batch File Forwarding", "Auto-Generate Thumbnails",
-        "Detect File Type & Sizes", "Custom Upload Naming", "In-Bot Premium Tiers",
-        "Auto-Renewing Lifetime Links", "Self-Serve Trial Buttons", "Native Telegram API",
-        "Live Upload Progress"
+        "Cinema Theatre Mode", "Fill/Fit Dynamic Ratios", "Hardware Accelerated UI",
+        "Picture-in-Picture Support", "Custom Video Controls", "Advanced Seeking & Timeline",
+        "HLS Adaptive Bitrate Streaming", "Auto-Resume Last Played", "Open in System Player App",
+        "Smart Multi-Source Switching"
       ]
     },
     {
-      category: "Dashboard & Management",
+      category: "Dashboard & Security",
       icon: <Settings className="text-pink-400" />,
       items: [
-        "Personalized Web Dashboard", "Track Total Files Downloaded", "View Active Subscriptions",
-        "Monitor Daily Usage Limits", "1-Click File Deletion", "Sort by Name & Date",
-        "Quick Search Files", "Dark & Light Theme Toggles", "Real-time Syncing",
-        "Cross-Device Session Persistence"
+        "AES-256 Link Encryption", "100% Anonymous Activity", "Self-Destructing Premium Links",
+        "Personalized Web Dashboard", "Track Total Files Streamed", "Dark & Light Themes",
+        "1-Click File Tracking", "No User Data Selling", "Bot Abuse Protection",
+        "Cross-Device Session Consistency"
       ]
     }
   ];
@@ -81,7 +81,7 @@ export default function Landing() {
       <nav className="fixed top-0 w-full z-50 bg-[color:var(--surface-color)]/80 backdrop-blur-xl border-b border-[color:var(--border-color)] transition-all">
         <div className="max-w-7xl mx-auto px-5 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={logoImg} alt="StreamDrop" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-lg border border-[color:var(--border-color)] object-cover" />
+            <img src={logoImg} alt="CinemaHub" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-lg border border-[color:var(--border-color)] object-cover bg-white" />
             <span className="font-black text-xl sm:text-2xl tracking-tight bg-gradient-to-r from-red-600 via-red-500 to-orange-500 bg-clip-text text-transparent">
               CinemaHub
             </span>
@@ -109,7 +109,7 @@ export default function Landing() {
 
           <motion.div variants={FADE_UP} className="mb-6 lg:mb-8 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-600/10 border border-red-500/20 shadow-sm">
             <Sparkles className="w-4 h-4 text-red-500 animate-pulse" />
-            <span className="text-xs sm:text-sm font-bold text-red-400">Introducing the Ultimate Telegram Streaming Bot</span>
+            <span className="text-xs sm:text-sm font-bold text-red-400">10 Million+ Movies, Series & Anime Library</span>
           </motion.div>
 
           <motion.h1 variants={FADE_UP} className="text-5xl sm:text-6xl lg:text-8xl font-black tracking-tighter leading-[1.1] mb-6">
@@ -119,9 +119,8 @@ export default function Landing() {
             </span>
           </motion.h1>
 
-          <motion.p variants={FADE_UP} className="text-base sm:text-xl text-[color:var(--text-muted)] max-w-2xl font-medium leading-relaxed mb-10 text-white/90">
-            Forward any movie, video, or audio file from Telegram to <b className="text-white">CinemaHub</b>.
-            Within milliseconds, receive an ultra-fast, securely encrypted streaming dashboard link with zero waiting time.
+          <motion.p variants={FADE_UP} className="text-base sm:text-xl text-[color:var(--text-muted)] max-w-3xl font-medium leading-relaxed mb-10 text-white/90">
+            Access over <b>10 Million+ files</b> including Movies, Series, Anime, Drama, and Cartoons completely free. Upgrade to Premium for ad-free direct downloads, direct browser streaming, and access to exclusive newly released market content.
           </motion.p>
 
           <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
@@ -141,8 +140,8 @@ export default function Landing() {
         <div className="bg-[color:var(--surface-color)] border border-[color:var(--border-color)] rounded-3xl p-6 sm:p-10 shadow-xl shadow-indigo-500/5 backdrop-blur-sm relative overflow-hidden">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center relative z-10">
             <div>
-              <h3 className="text-3xl sm:text-4xl font-black text-indigo-500 mb-1">0ms</h3>
-              <p className="text-xs sm:text-sm font-bold text-[color:var(--text-muted)] uppercase tracking-wider">Wait Time</p>
+              <h3 className="text-3xl sm:text-4xl font-black text-indigo-500 mb-1">10M+</h3>
+              <p className="text-xs sm:text-sm font-bold text-[color:var(--text-muted)] uppercase tracking-wider">Database</p>
             </div>
             <div>
               <h3 className="text-3xl sm:text-4xl font-black text-purple-500 mb-1">∞</h3>
@@ -153,8 +152,8 @@ export default function Landing() {
               <p className="text-xs sm:text-sm font-bold text-[color:var(--text-muted)] uppercase tracking-wider">Encrypted</p>
             </div>
             <div>
-              <h3 className="text-3xl sm:text-4xl font-black text-amber-500 mb-1">Web</h3>
-              <p className="text-xs sm:text-sm font-bold text-[color:var(--text-muted)] uppercase tracking-wider">App Required</p>
+              <h3 className="text-3xl sm:text-4xl font-black text-amber-500 mb-1">0₹</h3>
+              <p className="text-xs sm:text-sm font-bold text-[color:var(--text-muted)] uppercase tracking-wider">For Basic Plan</p>
             </div>
           </div>
         </div>
@@ -221,10 +220,10 @@ export default function Landing() {
 
         <div className="space-y-6">
           {[
-            { step: '01', title: 'Open the Bot', desc: `Click the "Launch Bot" button to open @STREAM_DROP_BOT on Telegram and hit /start.` },
-            { step: '02', title: 'Forward the Media', desc: 'Forward any Video, Movie, Document, or Audio from ANY public or private Telegram channel to the bot.' },
-            { step: '03', title: 'Get Secure Link', desc: 'The bot instantly replies with a unique, encrypted web URL specifically tied to your Telegram ID.' },
-            { step: '04', title: 'Play & Download', desc: 'Click the link to open the aesthetic StreamDrop Player. Watch it natively or click download.' },
+            { step: '01', title: 'Open the Bot', desc: `Click the "Launch Bot" button to open @Univora_CinemahubBot on Telegram and hit /start.` },
+            { step: '02', title: 'Search Any Movie', desc: 'Type any Movie, Series, Anime or Cartoon name. Our 10M+ database finds it instantly.' },
+            { step: '03', title: 'Get Direct Link', desc: 'The bot replies with an aesthetic web URL to securely stream without waiting.' },
+            { step: '04', title: 'Play & Download', desc: 'Stream natively on CinemaHub Player. Go Premium for blazing fast direct downloads and ad-free experience.' },
           ].map((item, idx) => (
             <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 bg-[color:var(--surface-color)] border border-[color:var(--border-color)] p-6 rounded-3xl group hover:border-indigo-500/30 transition-all">
               <div className="text-5xl font-black text-[color:var(--border-color)] group-hover:text-indigo-500/20 transition-colors">
@@ -242,7 +241,7 @@ export default function Landing() {
       {/* ── FOOTER CTA & CREDITS ── */}
       <footer className="border-t border-[color:var(--border-color)] bg-[color:var(--surface-color)]/50 mt-20">
         <div className="max-w-7xl mx-auto px-5 lg:px-8 py-16 text-center flex flex-col items-center">
-          <img src={logoImg} className="w-12 h-12 rounded-xl grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all mb-6" alt="Univora" />
+          <img src={logoImg} className="w-12 h-12 rounded-xl mb-6 bg-white object-contain" alt="CinemaHub" />
           <h2 className="text-2xl sm:text-3xl font-black mb-4">Ready to upgrade your streaming?</h2>
           <p className="text-[color:var(--text-muted)] font-medium mb-8">Join thousands of users utilizing CinemaHub's unlimited cloud capabilities.</p>
           <a href={BOT_LINK} target="_blank" rel="noopener noreferrer" className="bg-red-600 text-white px-8 py-3 rounded-xl font-bold text-lg hover:scale-105 transition-transform mb-16">

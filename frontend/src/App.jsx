@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react
 import { useState, useEffect } from 'react';
 import { Home, PlaySquare, Moon, Sun, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import logoImg from './assets/logo.jpg';
+import logoImg from './assets/logo.png';
 
 import Dashboard from './pages/Dashboard';
 import Show from './pages/Show';
@@ -12,14 +12,14 @@ import Landing from './pages/Landing';
 
 // Smart redirect: /show → last stream or 404
 function ShowRedirect() {
-  const last = localStorage.getItem('streamdrop_last_stream');
+  const last = localStorage.getItem('cinemahub_last_stream');
   if (last) return <Navigate to={`/show/${last}`} replace />;
   return <NotFound />;
 }
 
 function Layout({ children }) {
   const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('streamdrop_theme');
+    const saved = localStorage.getItem('cinemahub_theme');
     return saved !== null ? saved === 'dark' : true;
   });
   const location = useLocation();
@@ -27,16 +27,16 @@ function Layout({ children }) {
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
-    localStorage.setItem('streamdrop_theme', isDark ? 'dark' : 'light');
+    localStorage.setItem('cinemahub_theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
   const [dashUrl, setDashUrl] = useState(
-    () => localStorage.getItem('streamdrop_dash_url') || '/dashboard/unauthorized'
+    () => localStorage.getItem('cinemahub_dash_url') || '/dashboard/unauthorized'
   );
 
   useEffect(() => {
     const sync = () => {
-      const stored = localStorage.getItem('streamdrop_dash_url');
+      const stored = localStorage.getItem('cinemahub_dash_url');
       if (stored) setDashUrl(stored);
     };
     window.addEventListener('storage', sync);
@@ -57,8 +57,8 @@ function Layout({ children }) {
       {!isLanding && (
         <aside className="hidden md:flex flex-col w-64 border-r border-[color:var(--border-color)] bg-[color:var(--surface-color)] fixed h-full z-50">
           <div className="p-6 flex items-center gap-3">
-            <img src={logoImg} alt="StreamDrop" className="w-8 h-8 rounded-xl object-cover shadow-lg" />
-            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400">CinemaHub</h1>
+            <img src={logoImg} alt="CinemaHub" className="w-8 h-8 rounded-xl object-cover shadow-lg bg-white" />
+            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-400">CinemaHub</h1>
           </div>
 
           <nav className="flex-1 px-4 space-y-2 mt-4">
@@ -91,8 +91,8 @@ function Layout({ children }) {
       {!isLanding && (
         <header className="md:hidden flex items-center justify-between p-4 border-b border-[color:var(--border-color)] bg-[color:var(--surface-color)] sticky top-0 z-40 backdrop-blur-md bg-opacity-80">
           <div className="flex items-center gap-2">
-            <img src={logoImg} alt="StreamDrop" className="w-7 h-7 rounded-lg object-cover shadow-md" />
-            <h1 className="text-lg font-bold">CinemaHub</h1>
+            <img src={logoImg} alt="CinemaHub" className="w-7 h-7 rounded-lg object-cover shadow-md bg-white" />
+            <h1 className="text-lg font-bold text-red-500">CinemaHub</h1>
           </div>
           <button onClick={() => setIsDark(!isDark)} className="p-2 rounded-full bg-[color:var(--bg-color)] text-[color:var(--text-color)]">
             {isDark ? <Sun size={18} /> : <Moon size={18} />}

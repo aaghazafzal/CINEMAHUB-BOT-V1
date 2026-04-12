@@ -505,14 +505,7 @@
                     <button class="btn btn-dl" onclick="blazeDownload()">
                         <i class="fas fa-download"></i> Download
                     </button>
-                    <!-- Desktop: show VLC + MX here, mobile shows them in Open in Player below -->
-                    <button class="btn btn-vlc desktop-only" onclick="vlc_player()" id="vlcBtnTop">
-                        <img src="https://i.postimg.cc/15TQ4y7B/vlc.png" alt="VLC"> VLC
-                    </button>
-                    <button class="btn btn-mx desktop-only" onclick="mx_player()" id="mxBtnTop">
-                        <img src="https://i.postimg.cc/sx4Msv4T/mx.png" alt="MX"> MX Player
-                    </button>
-                    <!-- More dropdown (desktop) -->
+                    <!-- More dropdown -->
                     <div class="more-wrap">
                         <button class="btn btn-ghost" id="moreBtn" onclick="toggleMore()">
                             <i class="fas fa-ellipsis-h"></i> More
@@ -581,6 +574,11 @@
             <!-- MOBILE: grid of player apps -->
             <div class="mobile-players">
                 <div class="mobile-players-grid">
+                    <!-- System chooser — first -->
+                    <a href="#" class="mp-btn" onclick="system_player();return false;" style="border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.06)">
+                        <i class="fas fa-th-large" style="font-size:1.35rem;color:var(--ch-cyan)"></i>
+                        <span style="color:var(--ch-cyan)">Choose</span>
+                    </a>
                     <a href="#" class="mp-btn" onclick="mx_player();return false;">
                         <img src="https://i.postimg.cc/sx4Msv4T/mx.png" alt="MX">
                         <span>MX Player</span>
@@ -605,12 +603,8 @@
                         <img src="https://i.postimg.cc/rFT43LNh/hd.png" alt="HD">
                         <span>HD Player</span>
                     </a>
-                    <a href="#" class="mp-btn" onclick="mx_playerpro();return false;">
-                        <img src="https://i.postimg.cc/sx4Msv4T/mx.png" alt="MX Pro">
-                        <span>MX Pro</span>
-                    </a>
                     <a href="#" class="mp-btn" onclick="copyLink();return false;">
-                        <i class="fas fa-copy" style="color:var(--ch-cyan)"></i>
+                        <i class="fas fa-copy" style="color:var(--ch-cyan);font-size:1.3rem"></i>
                         <span>Copy URL</span>
                     </a>
                 </div>
@@ -625,6 +619,9 @@
                 <div class="desktop-btns">
                     <button class="btn btn-vlc" onclick="vlc_player()">
                         <img src="https://i.postimg.cc/15TQ4y7B/vlc.png" alt="VLC"> Open in VLC
+                    </button>
+                    <button class="btn btn-mx" onclick="mx_player()">
+                        <img src="https://i.postimg.cc/sx4Msv4T/mx.png" alt="MX"> MX Player
                     </button>
                     <button class="btn btn-ghost" onclick="copyLink()">
                         <i class="fas fa-link"></i> Copy URL
@@ -857,6 +854,8 @@
     function km_player()     { window.location.href = `intent:${FILE_URL}#Intent;package=com.kmplayer;end`; }
     function s_player()      { window.location.href = `intent:${FILE_URL}#Intent;action=com.young.simple.player.playback_online;package=com.young.simple.player;end`; }
     function hd_player()     { window.location.href = `intent:${FILE_URL}#Intent;package=uplayer.video.player;end`; }
+    // System chooser — lets Android show all available video apps
+    function system_player() { window.location.href = `intent:${FILE_URL}#Intent;action=android.intent.action.VIEW;type=video/*;end`; }
 
     // ── Hide mobile-only buttons on desktop ──
     const isDesktop = window.innerWidth > 768;

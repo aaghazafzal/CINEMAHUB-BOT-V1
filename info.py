@@ -238,6 +238,8 @@ SLEEP_THRESHOLD = int(environ.get('SLEEP_THRESHOLD', '60'))
 WORKERS = int(environ.get('WORKERS', '4'))
 SESSION_NAME = str(environ.get('SESSION_NAME', 'dreamXBotz'))
 PING_INTERVAL = int(environ.get("PING_INTERVAL", "1200"))
+MULTI_CLIENT = False
+name = str(environ.get('name', 'CINEMAHUB'))
 
 # ============================
 # Reactions Configuration

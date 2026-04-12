@@ -282,6 +282,7 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
                     "percent": round(percentage, 1),
                     "saved": total_files
                 })
+                elapsed = time.time() - start_time
                 avg_batch_time = sum(batch_times) / len(batch_times) if batch_times else 1
                 eta = (total_fetch - progress) / BATCH_SIZE * avg_batch_time
                 progress_bar = get_progress_bar(int(percentage))

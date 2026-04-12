@@ -594,7 +594,9 @@ Feel free to use the bot directly or add it to your own groups to enjoy the auto
 • /index_stats - <code>Cʜᴇᴄᴋ ᴀᴄᴛɪᴠᴇ ɪɴᴅᴇxɪɴɢ ᴊᴏʙ sᴛᴀᴛs</code>
 • /stop_indexing - <code>Sᴛᴏᴘ ʀᴜɴɴɪɴɢ ɪɴᴅᴇxɪɴɢ ᴊᴏʙ</code>
 • /restart - <code>Rᴇꜱᴛᴀʀᴛ ᴛʜᴇ Eɴᴛɪʀᴇ Sʏꜱᴛᴇᴍ Sᴀꜰᴇʟʏ</code>
-• /deleteall - <code>Dᴇʟᴇᴛᴇ ᴀʟʟ ꜰɪʟᴇꜱ ꜰʀᴏᴍ ᴛʜᴇ ᴅᴀᴛᴀʙᴀꜱᴇ</code>"""
+• /deleteall - <code>Dᴇʟᴇᴛᴇ ᴀʟʟ ꜰɪʟᴇꜱ ꜰʀᴏᴍ ᴛʜᴇ ᴅᴀᴛᴀʙᴀꜱᴇ</code>
+• /global_shortener - <code>Tᴏɢɢʟᴇ ɢʟᴏʙᴀʟ ꜱʜᴏʀᴛᴇɴᴇʀ</code>
+• /auto_index - <code>Tᴏɢɢʟᴇ ᴀᴜᴛᴏ ɪɴᴅᴇxɪɴɢ</code>"""
 
 
 

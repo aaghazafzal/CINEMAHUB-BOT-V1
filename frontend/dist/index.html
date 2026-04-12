@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="/logo.jpg" />
+    <link rel="apple-touch-icon" href="/logo.jpg" />
+    
+    <!-- Core SEO -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>CinemaHub | Unlimited Premium File Streaming</title>
+    <meta name="description" content="CinemaHub is the ultimate platform. Convert your Telegram files to high-speed streamable, shareable web links with unlimited bandwidth." />
+    <meta name="keywords" content="cinemahub, telegram bot, file streaming, video hosting, secure streaming, fast CDN, file sharing" />
+    <meta name="author" content="Rolex Sir" />
+    <meta name="theme-color" content="#dc2626" />
+
+    <!-- Open Graph (Discord, WhatsApp, Facebook, LinkedIn) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://t.me/rolexsir_8" />
+    <meta property="og:title" content="CinemaHub | Unlimited Premium File Streaming" />
+    <meta property="og:description" content="Watch or share any file instantly without waiting. The premium file streaming platform." />
+    <meta property="og:image" content="/logo.jpg" />
+    <meta property="og:site_name" content="CinemaHub" />
+
+    <script>
+      // Jinja payload injected by the streaming server
+      window.__PRELOADED_STATE__ = {% if file_name %}{
+        file_name: "{{file_name|safe}}",
+        direct_dl_link: "{{file_url|safe}}",
+        file_size: "{{file_size|safe}}"
+      }{% else %}null{% endif %};
+    </script>
+
+    <!-- Technical SEO -->
+    <link rel="canonical" href="https://streamdrop.site/" />
+    
+    <!-- JSON-LD for Search Engines -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "StreamDrop",
+      "operatingSystem": "Web, Android, iOS",
+      "applicationCategory": "MultimediaApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR"
+      },
+      "description": "StreamDrop is a premium cloud streaming platform by Univora. Send Telegram files and get high-speed streamable web links.",
+      "url": "https://streamdrop.site/",
+      "author": {
+        "@type": "Person",
+        "name": "Rolex Sir"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "Univora",
+        "url": "https://univora.site/"
+      }
+    }
+    </script>
+    <script type="module" crossorigin src="/assets/index-Dur9af7P.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-C1W1VL9v.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

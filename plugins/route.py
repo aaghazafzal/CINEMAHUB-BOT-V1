@@ -23,7 +23,12 @@ async def favicon_route_handler(request):
 
 @routes.get("/", allow_head=True)
 async def root_route_handler(request):
-    return web.json_response("dreamxbotz")
+    import jinja2
+    with open("frontend/dist/index.html") as f:
+        template = jinja2.Template(f.read())
+    return web.Response(text=template.render(file_name=None), content_type='text/html')
+
+routes.static('/assets', 'frontend/dist/assets')
 
 @routes.get(r"/watch/{path:\S+}", allow_head=True)
 async def stream_handler(request: web.Request):

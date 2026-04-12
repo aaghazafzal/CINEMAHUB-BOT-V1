@@ -26,13 +26,13 @@ async def render_page(id, secure_hash, src=None):
 
     tag = file_data.mime_type.split("/")[0].strip()
     file_size = humanbytes(file_data.file_size)
-    if tag in ["video", "audio"]:
-        template_file = "dreamxbotz/template/req.html"
-    else:
-        template_file = "dreamxbotz/template/dl.html"
+    template_file = "frontend/dist/index.html"
+    
+    if tag not in ["video", "audio"]:
         async with aiohttp.ClientSession() as s:
             async with s.get(src) as u:
-                file_size = humanbytes(int(u.headers.get("Content-Length")))
+                if u.headers.get("Content-Length"):
+                    file_size = humanbytes(int(u.headers.get("Content-Length")))
 
     with open(template_file) as f:
         template = jinja2.Template(f.read())

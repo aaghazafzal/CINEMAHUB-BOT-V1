@@ -216,15 +216,18 @@ BAD_WORDS = {
 
 PORT = int(environ.get("PORT", "8080"))
 NO_PORT = bool(environ.get('NO_PORT', False))
+APP_NAME = environ.get('APP_NAME')
+ON_HEROKU = is_enabled(os.environ.get('ON_HEROKU', "False"), False)
 BIND_ADRESS = str(getenv('WEB_SERVER_BIND_ADDRESS', '0.0.0.0'))
 RENDER_EXTERNAL_URL = getenv('RENDER_EXTERNAL_URL') # Auto-provided by Render if configured
 
-# Logic: Priority 1: FQDN, Priority 2: RENDER_EXTERNAL_URL, Priority 3: BIND_ADRESS (Local/IP)
+# Logic: Priority 1: FQDN, Priority 2: RENDER_EXTERNAL_URL, Priority 3: Heroku/Local
 if getenv('FQDN'):
     FQDN = getenv('FQDN')
 elif RENDER_EXTERNAL_URL:
-    # Render URL usually looks like https://svc-name.onrender.com
     FQDN = RENDER_EXTERNAL_URL.replace("https://", "").replace("http://", "").rstrip("/")
+elif ON_HEROKU and APP_NAME:
+    FQDN = f"{APP_NAME}.herokuapp.com"
 else:
     FQDN = BIND_ADRESS
 
@@ -232,7 +235,6 @@ HAS_SSL = is_enabled(getenv('HAS_SSL', 'True'), True)
 if HAS_SSL:
     URL = "https://{}/".format(FQDN)
 else:
-    # If no SSL and not on a standard port, include port
     if NO_PORT:
         URL = "http://{}/".format(FQDN)
     else:
@@ -241,6 +243,11 @@ else:
 # Fallback handling: If URL looks like an IP but RENDER_EXTERNAL_URL exists, prefer Render
 if FQDN == BIND_ADRESS and RENDER_EXTERNAL_URL:
     URL = RENDER_EXTERNAL_URL if RENDER_EXTERNAL_URL.endswith("/") else RENDER_EXTERNAL_URL + "/"
+
+SLEEP_THRESHOLD = int(environ.get('SLEEP_THRESHOLD', '60'))
+WORKERS = int(environ.get('WORKERS', '4'))
+SESSION_NAME = str(environ.get('SESSION_NAME', 'dreamXBotz'))
+PING_INTERVAL = int(environ.get("PING_INTERVAL", "1200"))
 
 # ============================
 # Reactions Configuration

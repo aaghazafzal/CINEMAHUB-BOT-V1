@@ -21,6 +21,10 @@ routes = web.RouteTableDef()
 async def favicon_route_handler(request):
     return web.FileResponse('dreamxbotz/template/favicon.ico')
 
+@routes.get("/logo.png")
+async def logo_route_handler(request):
+    return web.FileResponse('frontend/dist/logo.png')
+
 @routes.get("/", allow_head=True)
 async def root_route_handler(request):
     import jinja2

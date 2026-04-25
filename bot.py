@@ -19,7 +19,7 @@ import asyncio
 from datetime import date, datetime
 import pytz
 from aiohttp import web
-from database.ia_filterdb import Media, Media2
+from database.ia_filterdb import Media, Media2, _MEDIA_MODELS
 from database.users_chats_db import db
 from info import *
 from utils import temp
@@ -70,8 +70,12 @@ async def dreamxbotz_start():
     temp.BANNED_CHATS = b_chats
     await Media.ensure_indexes()
     if MULTIPLE_DB:
-        await Media2.ensure_indexes()
-        print("Multiple Database Mode On. Now Files Will Be Save In Second DB If First DB Is Full")
+        for model in _MEDIA_MODELS[1:]:
+            try:
+                await model.ensure_indexes()
+            except Exception as e:
+                logging.warning(f"ensure_indexes failed for a model: {e}")
+        print(f"Multiple Database Mode On. {len(_MEDIA_MODELS)} DBs active.")
     else:
         print("Single DB Mode On ! Files Will Be Save In First Database")
     me = await dreamxbotz.get_me()
@@ -94,6 +98,13 @@ async def dreamxbotz_start():
     bind_address = "0.0.0.0"
     await web.TCPSite(app, bind_address, PORT).start()
     dreamxbotz.loop.create_task(keep_alive())
+    # ── Start Auto-Index background loop ──
+    try:
+        from plugins.index import auto_index_loop
+        dreamxbotz.loop.create_task(auto_index_loop(dreamxbotz))
+        logging.info("[AUTO-INDEX] Background loop started.")
+    except Exception as e:
+        logging.warning(f"[AUTO-INDEX] Could not start loop: {e}")
     await idle()
     
 if __name__ == '__main__':
